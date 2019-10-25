@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Bilibili v.mini</title>
-	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="css/main-window.css">
 </head>
 <body>
 
@@ -11,7 +11,8 @@
 	<div id="wrapper">
 
 		<!-- webview -->
-    <webview id="wv" src="http://m.bilibili.com/index.html" useragent="bilimini Mobile like (iPhone or Android) whatever" preload="./inject.js"></webview>
+		<!-- 直播有几率会跨域请求 acgvideo.com 的视频资源，为了看直播只好 disablewebsecurity 了，不知道会不会有安全问题？ -->
+	    <webview id="wv" src="http://m.bilibili.com/index.html" useragent="bilimini Mobile like (iPhone or Android) whatever AppleWebKit/124.50 Mobile/BI233" preload="./js/inject.js" disablewebsecurity></webview>
 
 		<!-- loading -->
 		<div id="loading"></div>
@@ -19,10 +20,10 @@
 		<!-- about -->
 		<div id="about">
 			<div><img src="images/icon.png"></div>
-			<div id="about-title">藏起来！哔哩哔哩</div>
+			<div id="about-title">藏起来！哔哩哔哩 v{{ version }}</div>
 			<p>Tip：按Ctrl+e（ Mac下Option+w ）可以快速隐藏此程序</p>
-			<p>Made by <a href="http://weibo.com/chitosai" target="_blank">@千歳</a> with LOVE</p>
-			<p>代码开源于<a href="https://github.com/chitosai/bilimini">Github</a></p>
+			<p>Made by <a href="javascript: openExternalLink('http://weibo.com/chitosai');">@千歳</a> with LOVE</p>
+			<p>代码开源于<a href="javascript: openExternalLink('https://github.com/chitosai/bilimini');">Github</a></p>
 		</div>
 		<div id="about-overlay" :class="{globalOverlay: 1, active: showAboutOverlay}" @click="hideAbout"></div>
 
@@ -35,7 +36,10 @@
 			</div>
 			<div id="dragzone">这里可以拖拽</div>
 			<div id="icon-bar-right">
-				<span id="app-close" class="top-btn icon-btn" @click="toggleDanmaku">弹</span>
+				<span id="app-danmaku" class="top-btn icon-btn" @click="toggleDanmaku" :disabled="disableDanmakuButton">弹</span>
+				<span id="app-part" class="top-btn icon-btn" @click="toggleSelectPartWindow" :disabled="disablePartButton">P</span>
+				<span id="app-feed" class="top-btn icon-btn" @click="showFeed"></span>
+				<span id="app-config" class="top-btn icon-btn" @click="toggleConfig"></span>
 				<span id="app-about" class="top-btn icon-btn" @click="showAbout">?</span>
 				<span id="app-close" class="top-btn icon-btn" @click="turnOff">x</span>
 			</div>
@@ -43,9 +47,9 @@
 
 		<!-- overlay -->
 		<div :class="{globalOverlay: 1, active: showNaviGotoOverlay}" @click="naviGotoHide">
-			<div id="input-layer" :class="{active: naviGotoInputShow}" @click.stop>
-				<input type="text" id="input" placeholder="输入要前往的av号或者视频地址" v-model="naviGotoTarget" @keyup.enter="naviGoto"><!--
-				--><span id="input-finish" @click="naviGoto">确认</span>
+			<div id="av-input-layer" :class="{active: naviGotoInputShow}" @click.stop>
+				<input type="text" id="av-input" placeholder="输入要前往的av号或者视频地址" v-model="naviGotoTarget" @keyup.enter="naviGoto"><!--
+				--><span id="av-input-finish" @click="naviGoto">确认</span>
 			</div>
 		</div>
 
